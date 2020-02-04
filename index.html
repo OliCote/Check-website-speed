@@ -1,0 +1,164 @@
+<script>
+    function run() {
+        const mobileUrl = setUpMobileQuery();
+        const desktopUrl = setUpDesktopQuery();
+        const key = "AIzaSyBs5qtVOVwsNbqt4e1iVWm6u8M66ud3DMY";
+        
+        var mobileScore = showMobile(mobileUrl);
+        // var desktopScore = showDesktop(desktopUrl);
+        
+      
+    }
+
+    function showMobile(url){
+        var score = "";
+
+        var numTasksOver100ms = "";
+        var numTasksOver50ms = "";
+        fetch(url)
+            .then(response => response.json())
+            .then(json => {
+       
+                showInitialContent(json.id);
+                var jsonScore = json.lighthouseResult.categories.performance.score;
+                score += JSON.stringify(jsonScore);
+
+                var numTasksOver500ms = JSON.stringify(json.lighthouseResult.audits.diagnostics.details.items.numTasksOver500ms);
+                var numTasksOver25ms = json.lighthouseResult.audits.diagnostics.details.items;
+                console.log(json.lighthouseResult.audits.diagnostics.details.items);
+                FindElement(numTasksOver25ms,"numTasksOver100ms");
+
+
+                if(score <= 0.80){
+                    window.open('mailto:oli.cote00@gmail.com?subject=SomethingWrong&body='+ score);
+                    console.log("The email is sent!");
+                }
+                
+                const p = document.createElement('p');
+                p.textContent = score;
+                document.body.appendChild(p);
+            //   const cruxMetrics = {
+            //     "First Contentful Paint": json.first-meaningful-paint.showCruxContent
+            //     // "First Input Delay": json.loadingExperience.metrics.FIRST_INPUT_DELAY_MS.category
+            //   };
+            //   showCruxContent(cruxMetrics, key);
+            //   const lighthouse = json.lighthouseResult;
+            //   const lighthouseMetrics = {
+            //     'First Contentful Paint': lighthouse.audits['first-contentful-paint'].displayValue,
+            //     'Speed Index': lighthouse.audits['speed-index'].displayValue,
+            //     'Time To Interactive': lighthouse.audits['interactive'].displayValue,
+            //     'First Meaningful Paint': lighthouse.audits['first-meaningful-paint'].displayValue,
+            //     'First CPU Idle': lighthouse.audits['first-cpu-idle'].displayValue,
+            //     'Estimated Input Latency': lighthouse.audits['estimated-input-latency'].displayValue
+            //   };
+            //   showLighthouseContent(lighthouseMetrics);
+        })
+    }
+
+    function FindElement(arr){
+
+        var numTasksOver100ms = "numTasksOver100ms";
+        var numTasksOver500ms = "numTasksOver500ms";
+        
+        for(var i=0;i<=arr.length;i++){
+          if(arr[i][numTasksOver100ms] > 2){
+            console.log("not nice")
+          }
+          if(numTasksOver500ms > 0) {
+            console.log("NOT GOOD!!");
+          }
+
+        }
+    } 
+
+    function showDesktop(url){
+        fetch(url)
+            .then(response => response.json())
+            .then(json => {
+       
+                showInitialContent(json.id);
+                var jsonScore = json.lighthouseResult.categories.performance.score;
+                var score = JSON.stringify(jsonScore);
+                console.log(score);
+                return score;
+                // const p = document.createElement('h1');
+                // p.textContent = score;
+                // document.body.appendChild();
+
+        });
+    }
+    
+    function setUpMobileQuery() {
+      const api = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+      const parameters = {
+        url: 'https://orphic.ca',
+        key: "AIzaSyBs5qtVOVwsNbqt4e1iVWm6u8M66ud3DMY",
+        strategy: "mobile"
+      };
+      let query = `${api}?`;
+      for (key in parameters) {
+        query += "&";
+        query += `${key}=${parameters[key]}`;
+      }
+      return query;
+    }
+
+    function setUpDesktopQuery() {
+      const api = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
+      const parameters = {
+        url: 'https://www.freecodecamp.org/the-fastest-web-page-on-the-internet',
+        key: "AIzaSyBs5qtVOVwsNbqt4e1iVWm6u8M66ud3DMY"
+      };
+      let query = `${api}?`;
+      for (key in parameters) {
+        query += "&";
+        query += `${key}=${parameters[key]}`;
+      }
+      return query;
+    }
+    
+    function showInitialContent(id) {
+      document.body.innerHTML = '';
+      const title = document.createElement('h1');
+      title.textContent = 'PageSpeed Insights API Demo';
+      document.body.appendChild(title);
+      const page = document.createElement('p');
+      page.textContent = `Page tested: ${id}`;
+      document.body.appendChild(page);
+    }
+    
+    function showCruxContent(cruxMetrics, key) {
+      const cruxHeader = document.createElement('h2');
+      cruxHeader.textContent = "Chrome User Experience Report Results";
+      document.body.appendChild(cruxHeader);
+      for (key in cruxMetrics) {
+        const p = document.createElement('p');
+        p.textContent = `${key}: ${cruxMetrics[key]}`;
+        document.body.appendChild(p);
+      }
+    }
+    
+    function showLighthouseContent(lighthouseMetrics,key) {
+      const lighthouseHeader = document.createElement('h2');
+      lighthouseHeader.textContent = "Lighthouse Results";
+      document.body.appendChild(lighthouseHeader);
+      for (key in lighthouseMetrics) {
+        const p = document.createElement('p');
+        p.textContent = `${key}: ${lighthouseMetrics[key]}`;
+        document.body.appendChild(p);
+      }
+    }
+    
+    run();
+    </script>
+    
+    <!DOCTYPE hmtl>
+    <html>
+        <head>
+            <title>Website speed</title>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        </head>
+        <body>
+            <div id="demo"></div>
+        </body>
+    </html>
