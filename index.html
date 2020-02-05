@@ -3,90 +3,82 @@
         const mobileUrl = setUpMobileQuery();
         const desktopUrl = setUpDesktopQuery();
         const key = "AIzaSyBs5qtVOVwsNbqt4e1iVWm6u8M66ud3DMY";
-        
-        var mobileScore = showMobile(mobileUrl);
-        // var desktopScore = showDesktop(desktopUrl);
+
+        fetchMobile(mobileUrl);
         
       
     }
 
-    function showMobile(url){
-        var score = "";
+    function fetchMobile(mobileUrl){
+      
+      fetch(mobileUrl)
+          .then(response => response.json())
+          .then(json => {
+            
+            const lighthouse = json.lighthouseResult;
 
-        var numTasksOver100ms = "";
-        var numTasksOver50ms = "";
-        fetch(url)
-            .then(response => response.json())
-            .then(json => {
-       
-                showInitialContent(json.id);
-                var jsonScore = json.lighthouseResult.categories.performance.score;
-                score += JSON.stringify(jsonScore);
+            const mobileHeader = document.createElement('h2');
+            mobileHeader.textContent = "Mobile User Experience Report";
+            document.body.appendChild(mobileHeader);
+            console.log("pq");
+            console.log(MobileTest(lighthouse));
 
-                var numTasksOver500ms = JSON.stringify(json.lighthouseResult.audits.diagnostics.details.items.numTasksOver500ms);
-                var numTasksOver25ms = json.lighthouseResult.audits.diagnostics.details.items;
-                console.log(json.lighthouseResult.audits.diagnostics.details.items);
-                FindElement(numTasksOver25ms,"numTasksOver100ms");
+            const mobileErrors = document.createElement('p');
+            mobileErrors.textContent = MobileTest(lighthouse);
+            document.body.appendChild(mobileErrors);
+            
 
-
-                if(score <= 0.80){
-                    window.open('mailto:oli.cote00@gmail.com?subject=SomethingWrong&body='+ score);
-                    console.log("The email is sent!");
-                }
-                
-                const p = document.createElement('p');
-                p.textContent = score;
-                document.body.appendChild(p);
-            //   const cruxMetrics = {
-            //     "First Contentful Paint": json.first-meaningful-paint.showCruxContent
-            //     // "First Input Delay": json.loadingExperience.metrics.FIRST_INPUT_DELAY_MS.category
-            //   };
-            //   showCruxContent(cruxMetrics, key);
-            //   const lighthouse = json.lighthouseResult;
-            //   const lighthouseMetrics = {
-            //     'First Contentful Paint': lighthouse.audits['first-contentful-paint'].displayValue,
-            //     'Speed Index': lighthouse.audits['speed-index'].displayValue,
-            //     'Time To Interactive': lighthouse.audits['interactive'].displayValue,
-            //     'First Meaningful Paint': lighthouse.audits['first-meaningful-paint'].displayValue,
-            //     'First CPU Idle': lighthouse.audits['first-cpu-idle'].displayValue,
-            //     'Estimated Input Latency': lighthouse.audits['estimated-input-latency'].displayValue
-            //   };
-            //   showLighthouseContent(lighthouseMetrics);
+            
         })
     }
 
-    function FindElement(arr){
+    function fectchDesktop(desktopUrl){
 
+      fetch(desktopUrl)
+          .then(response => response.json())
+          .then(json => {
+            const lighthouse = json.lighthouseResult;
+            desktopTest(lighthouse);
+            
+        })
+    }
+
+    function MobileTest(jon){
+     
+
+        var errors = "";
+        var diagnostics = jon.audits.diagnostics.details.items;
+        var score = jon.categories.performance.score;
+        errors = FetchDiagnostics(diagnostics);
+        errors = FetchScore(score);
+        
+        return errors;
+    }
+
+    function FetchDiagnostics(arr){
+        var errors = "";
         var numTasksOver100ms = "numTasksOver100ms";
         var numTasksOver500ms = "numTasksOver500ms";
+        console.log(arr);
         
         for(var i=0;i<=arr.length;i++){
-          if(arr[i][numTasksOver100ms] > 2){
-            console.log("not nice")
+          console.log(arr[i][numTasksOver100ms]);
+          if(arr[i][numTasksOver100ms] >= 0){
+            errors = "Trop de taches qui prennent 100ms <br>";
           }
           if(numTasksOver500ms > 0) {
-            console.log("NOT GOOD!!");
+            errors += "Trop de taches qui prennent 500 ms <br>"
           }
-
         }
-    } 
+        console.log("salut");
 
-    function showDesktop(url){
-        fetch(url)
-            .then(response => response.json())
-            .then(json => {
-       
-                showInitialContent(json.id);
-                var jsonScore = json.lighthouseResult.categories.performance.score;
-                var score = JSON.stringify(jsonScore);
-                console.log(score);
-                return score;
-                // const p = document.createElement('h1');
-                // p.textContent = score;
-                // document.body.appendChild();
-
-        });
+        return errors;
     }
+
+    function fetchScore(score){
+       return JSON.stringify(score);
+    }
+
     
     function setUpMobileQuery() {
       const api = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
